@@ -21,17 +21,13 @@ export class AppComponent {
   constructor(private socketService: SocketService) {}
 
   ngOnInit() {
-    this.username = localStorage.getItem('username') || prompt('Enter your name:') || 'User';
-    localStorage.setItem('username', this.username);
-
-    this.roomID = localStorage.getItem('roomID') || prompt('Enter Room ID:') || '';
+    this.username = prompt('Enter your name:') || 'User';
+    this.roomID = prompt('Enter Room ID:') || '';
 
     if (!this.roomID) {
       alert('Room ID required!');
       return;
     }
-
-    localStorage.setItem('roomID', this.roomID); // Save to localStorage
 
     this.socketService.joinRoom(this.username, this.roomID);
 
@@ -41,10 +37,6 @@ export class AppComponent {
 
     this.socketService.onUserCount((count) => {
       this.userCount = count;
-      if (this.userCount > 3) {
-        alert('Chat room full! Please try another room.');
-        this.leaveRoom();
-      }
     });
 
     this.socketService.onError((error) => {
@@ -67,6 +59,5 @@ export class AppComponent {
     this.isJoined = false;
     this.messages = [];
     this.userCount = 0;
-    localStorage.removeItem('roomID'); // Remove roomID when leaving
   }
 }
