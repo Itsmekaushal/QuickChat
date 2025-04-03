@@ -1,10 +1,10 @@
 <div *ngIf="isJoined" class="chat-container">
   <div class="header">
     <h2>QuickChat</h2>
-    <button class="leave-btn" (click)="leaveRoom()">🚪 Exit</button>
+    <button class="leave-btn" (click)="leaveRoom()">🚪 Leave</button>
   </div>
-
-  <p class="user-count">Users Online: {{ userCount }}/3</p>  <!-- Updated Text -->
+  
+  <p class="user-count">Active Users: {{ userCount }} / 3</p>
 
   <div class="chat-box">
     <div *ngFor="let msg of messages" class="message" [class.me]="msg.sender === username">
