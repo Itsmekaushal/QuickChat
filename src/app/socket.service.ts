@@ -9,27 +9,25 @@ export class SocketService {
     this.socket = io('http://localhost:5000');
   }
 
-  joinRoom(username: string, roomID: string, accessID: string) {
-    this.socket.emit('joinRoom', { username, roomID, accessID });
+  joinRoom(username: string, roomID: string, callback: (roomFull: boolean) => void) {
+    this.socket.emit('joinRoom', { username, roomID });
+    this.socket.on('roomFull', () => callback(true));
+    this.socket.on('roomJoined', () => callback(false));
   }
 
-  sendMessage(message: { sender: string; text: string }) {
-    this.socket.emit('message', message);
+  sendMessage(roomId: string, message: { sender: string; text: string }) {
+    this.socket.emit('message', { roomId, ...message });
   }
 
   onMessage(callback: (message: any) => void) {
     this.socket.on('message', callback);
   }
 
+  leaveRoom(roomID: string) {
+    this.socket.emit('leaveRoom', roomID);
+  }
+
   onUserCount(callback: (count: number) => void) {
     this.socket.on('userCount', callback);
-  }
-
-  onError(callback: (error: string) => void) {
-    this.socket.on('error', callback);
-  }
-
-  disconnect() {
-    this.socket.disconnect();
   }
 }
