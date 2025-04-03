@@ -1,7 +1,10 @@
 <div *ngIf="isJoined" class="chat-container">
-  <h2>QuickChat - Room: {{ roomID }}</h2>
-  <button class="leave-btn" (click)="leaveChat()">❌ Leave Room</button>
-  <p>Active Users: {{ userCount }} / 3</p>
+  <div class="header">
+    <h2>QuickChat</h2>
+    <button class="leave-btn" (click)="leaveRoom()">🚪 Exit</button>
+  </div>
+
+  <p class="user-count">Users Online: {{ userCount }}/3</p>  <!-- Updated Text -->
 
   <div class="chat-box">
     <div *ngFor="let msg of messages" class="message" [class.me]="msg.sender === username">
@@ -9,6 +12,8 @@
     </div>
   </div>
 
-  <input [(ngModel)]="messageText" placeholder="Type a message..." (keyup.enter)="sendMessage()" />
-  <button (click)="sendMessage()">Send</button>
+  <div class="input-area">
+    <input [(ngModel)]="messageText" placeholder="Type a message..." (keyup.enter)="sendMessage()" />
+    <button (click)="sendMessage()">Send</button>
+  </div>
 </div>
