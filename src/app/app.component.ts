@@ -14,44 +14,44 @@ export class AppComponent {
   messages: { sender: string; text: string }[] = [];
   messageText: string = '';
   username: string = '';
-  accessID: string = ''; // ✅ Now asking for Access ID
+  roomId: string = '';
   userCount: number = 0;
-  roomID = 'quickchatroom';
-  isJoined = false;
+  isJoined: boolean = false;  
 
   constructor(private socketService: SocketService) {}
 
   ngOnInit() {
     this.username = prompt('Enter your name:') || 'User';
-    this.accessID = prompt('Enter Access ID:') || '';
+    this.roomId = prompt('Enter Room ID:') || this.generateRoomId();
 
-    this.socketService.joinRoom(this.username, this.roomID, this.accessID);
-
-    this.socketService.onMessage((msg) => {
-      this.messages.push(msg);
+    this.socketService.joinRoom(this.username, this.roomId, (roomFull: boolean) => {
+      if (roomFull) {
+        alert('Room is full! Try another Room ID.');
+        return;
+      }
+      this.isJoined = true;
+      this.socketService.onMessage((msg) => this.messages.push(msg));
+      this.socketService.onUserCount((count) => this.userCount = count);
     });
-
-    this.socketService.onUserCount((count) => {
-      this.userCount = count;
-    });
-
-    this.socketService.onError((error) => {
-      alert(error);
-      this.isJoined = false;
-    });
-
-    this.isJoined = true;
   }
 
   sendMessage() {
     if (this.messageText.trim()) {
-      this.socketService.sendMessage({ sender: this.username, text: this.messageText });
+      this.socketService.sendMessage(this.roomId, {
+        sender: this.username,
+        text: this.messageText
+      });
       this.messageText = '';
     }
   }
 
   leaveChat() {
+    this.socketService.leaveRoom(this.roomId);
     this.isJoined = false;
-    this.socketService.disconnect();
+    this.messages = [];
+  }
+
+  generateRoomId(): string {
+    return Math.random().toString(36).substr(2, 6);
   }
 }
