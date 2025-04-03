@@ -9,14 +9,16 @@ export class SocketService {
     this.socket = io('http://localhost:5000');
   }
 
-  joinRoom(username: string, roomID: string, accessID: string, callback: (error: string | null) => void) {
-    this.socket.emit('joinRoom', { username, roomID, accessID }, (response: { success: boolean; error?: string }) => {
-      callback(response.success ? null : response.error || 'Unknown error');
-    });
+  joinRoom(username: string, roomID: string) {
+    this.socket.emit('joinRoom', { username, roomID });
   }
 
   sendMessage(message: { sender: string; text: string }) {
     this.socket.emit('message', message);
+  }
+
+  leaveRoom() {
+    this.socket.emit('leaveRoom');
   }
 
   onMessage(callback: (message: any) => void) {
@@ -27,7 +29,7 @@ export class SocketService {
     this.socket.on('userCount', callback);
   }
 
-  disconnect() {
-    this.socket.disconnect();
+  onError(callback: (error: string) => void) {
+    this.socket.on('error', callback);
   }
 }
