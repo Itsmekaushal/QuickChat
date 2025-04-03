@@ -14,25 +14,22 @@ export class AppComponent {
   messages: { sender: string; text: string }[] = [];
   messageText: string = '';
   username: string = '';
-  accessID: string = '';
+  roomID: string = '';
   userCount: number = 0;
-  roomID = 'quickchatroom';
   isJoined = false;
 
   constructor(private socketService: SocketService) {}
 
   ngOnInit() {
     this.username = prompt('Enter your name:') || 'User';
-    this.accessID = prompt('Enter Access ID:') || '';
+    this.roomID = prompt('Enter Room ID:') || '';
 
-    this.socketService.joinRoom(this.username, this.roomID, this.accessID, (error) => {
-      if (error) {
-        alert(error);
-        this.isJoined = false;
-      } else {
-        this.isJoined = true;
-      }
-    });
+    if (!this.roomID) {
+      alert('Room ID required!');
+      return;
+    }
+
+    this.socketService.joinRoom(this.username, this.roomID);
 
     this.socketService.onMessage((msg) => {
       this.messages.push(msg);
@@ -41,6 +38,13 @@ export class AppComponent {
     this.socketService.onUserCount((count) => {
       this.userCount = count;
     });
+
+    this.socketService.onError((error) => {
+      alert(error);
+      this.isJoined = false;
+    });
+
+    this.isJoined = true;
   }
 
   sendMessage() {
@@ -50,8 +54,10 @@ export class AppComponent {
     }
   }
 
-  leaveChat() {
+  leaveRoom() {
+    this.socketService.leaveRoom();
     this.isJoined = false;
-    this.socketService.disconnect();
+    this.messages = [];
+    this.userCount = 0;
   }
 }
